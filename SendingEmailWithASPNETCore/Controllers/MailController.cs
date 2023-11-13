@@ -9,7 +9,6 @@ namespace SendingEmailWithASPNETCore.Controllers
     {
         private readonly IAPIMailService _apiMailService;
 
-        //injecting the IMailService into the constructor
         public MailAPIController(IAPIMailService apiMailService)
         {
             _apiMailService = apiMailService;

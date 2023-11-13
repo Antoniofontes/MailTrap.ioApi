@@ -16,10 +16,10 @@ namespace SendingEmailWithASPNETCore.Services
 
         public async Task<bool> SendHTMLMailAsync(HTMLMailData htmlMailData)
         {
-            string filePath = Directory.GetCurrentDirectory() + "\\Templates\\Hello.html";
+            string filePath = Directory.GetCurrentDirectory() + "\\Templates\\welcome.html";
             string emailTemplateText = File.ReadAllText(filePath);
 
-            var htmlBody = string.Format(emailTemplateText, htmlMailData.EmailToName, DateTime.Today.Date.ToShortDateString());
+            var htmlBody = emailTemplateText;
 
             var apiEmail = new
             {
