@@ -23,9 +23,18 @@ namespace SendingEmailWithASPNETCore.Controllers
 
         [HttpPost]
         [Route("SendHTMLMailAsync")]
-        public async Task<bool> SendHTMLMailAsync(HTMLMailData htmlMailData)
+        public async Task<bool> SendHTMLMailAsync(List<HTMLMailData> htmlMailDataList, [FromHeader] string tokenTemplate)
         {
-            return await _apiMailService.SendHTMLMailAsync(htmlMailData);
+            foreach (var htmlMailData in htmlMailDataList) {                
+                
+               var result = await _apiMailService.SendHTMLMailAsync(htmlMailData,tokenTemplate);
+
+                if(!result)
+                {
+                     return false;
+                }
+            }
+            return true;
         }
 
         [HttpPost]
