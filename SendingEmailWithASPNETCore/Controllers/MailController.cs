@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SendingEmailWithASPNETCore.Services;
+using ShipmentInformation;
 
 namespace SendingEmailWithASPNETCore.Controllers
 {
@@ -23,18 +24,15 @@ namespace SendingEmailWithASPNETCore.Controllers
 
         [HttpPost]
         [Route("SendHTMLMailAsync")]
-        public async Task<bool> SendHTMLMailAsync(List<HTMLMailData> htmlMailDataList, [FromHeader] string tokenTemplate)
+        public async Task<bool> SendHTMLMailAsync([FromBody] ClientGuideData clientGuideData, [FromHeader] string tokenTemplate)
         {
-            foreach (var htmlMailData in htmlMailDataList) {                
-                
-               var result = await _apiMailService.SendHTMLMailAsync(htmlMailData,tokenTemplate);
-
-                if(!result)
-                {
-                     return false;
-                }
-            }
-            return true;
+           var result = await _apiMailService.SendHTMLMailAsync(clientGuideData, tokenTemplate);
+              if(!result)
+              {
+                return false;
+              }
+            
+           return true;
         }
 
         [HttpPost]

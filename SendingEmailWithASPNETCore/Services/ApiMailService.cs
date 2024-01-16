@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Crmf;
 using RestSharp;
+using ShipmentInformation;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -19,9 +20,9 @@ namespace SendingEmailWithASPNETCore.Services
             _httpClient = httpClientFactory.CreateClient("MailTrapApiClient");
         }
 
-        public async Task<bool> SendHTMLMailAsync(HTMLMailData htmlMailData, string tokenTemplate)
+        public async Task<bool> SendHTMLMailAsync(ClientGuideData data, string tokenTemplate)
         {
-            var htmlTemplateText = await GetTemplateContentFromMailtrap(htmlMailData.EmailToId,tokenTemplate, htmlMailData.EmailToName);
+            var htmlTemplateText = await GetTemplateContentFromMailtrap(data.Cli.CliEma,tokenTemplate, data.Cli.CliNom);
             var htmlBody = htmlTemplateText;
 
             var apiEmail = new
