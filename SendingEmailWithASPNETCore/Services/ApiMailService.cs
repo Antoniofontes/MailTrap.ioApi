@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Asn1.Crmf;
 using RestSharp;
 using ShipmentInformation;
 using System.Net;
-using System.Net.Http.Headers;
 
 namespace SendingEmailWithASPNETCore.Services
 {
@@ -22,17 +19,22 @@ namespace SendingEmailWithASPNETCore.Services
 
         public async Task<bool> SendHTMLMailAsync(ClientGuideData data, string tokenTemplate)
         {
-            var htmlTemplateText = await GetTemplateContentFromMailtrap(data.Cli.CliEma,tokenTemplate, data.Cli.CliNom);
+            var htmlTemplateText = await GetTemplateContentFromMailtrap(data.Cli.CliEma,tokenTemplate, data.Cli.CliNom,data);
             var htmlBody = htmlTemplateText;
+
 
             var apiEmail = new
             {
                 From = new { Email = _mailSettings.SenderEmail, Name = _mailSettings.SenderEmail },
-                To = new[] { new { Email = htmlMailData.EmailToId, Name = htmlMailData.EmailToName } },
-                Subject = htmlBody,
+                To = new[] { new { Email = data.Cli.CliEma, Name = data.Cli.CliNom } },
+                Subject = "Shipment update",
                 Html = htmlBody
             };
-
+            
+            if(apiEmail.Html== "true")
+            {
+                return true;
+            }
             var httpResponse = await _httpClient.PostAsJsonAsync("send", apiEmail);
 
             var responseJson = await httpResponse.Content.ReadAsStringAsync();
@@ -46,23 +48,37 @@ namespace SendingEmailWithASPNETCore.Services
             return false;
         }
 
-        private async Task<string> GetTemplateContentFromMailtrap(string email,string tokenTemplate, string name)
+        private async Task<string> GetTemplateContentFromMailtrap(string email,string tokenTemplate, string name, ClientGuideData data)
         {
-            string htmlTemplateText = await RetrieveTemplateContentUsingMailtrapAPI( email,tokenTemplate,name);
+            string htmlTemplateText = await RetrieveTemplateContentUsingMailtrapAPI( email,tokenTemplate,name, data);
             return htmlTemplateText;
         }
-        private async Task<string> RetrieveTemplateContentUsingMailtrapAPI(string email,string tokenTemplate,string name)
+        private async Task<string> RetrieveTemplateContentUsingMailtrapAPI(string email, string tokenTemplate, string name, ClientGuideData data)
         {
             string _mailtrapApiKey = "9f875d92a1ac089025aa184ba649ee4e";
+
             try
             {
                 var client = new RestClient("https://send.api.mailtrap.io/api/send");
-
-                var request = new RestRequest("",Method.Post);
+                var request = new RestRequest("", Method.Post);
                 request.AddHeader("Authorization", $"Bearer {_mailtrapApiKey}");
                 request.AddHeader("Content-Type", "application/json");
 
-                // Puedes modificar los datos del mensaje según tus necesidades
+                var guidesList = data.Guias.Select(guide => new
+                {
+                    date = guide.Fecha.Date,
+                    sender_name = guide.Remitente,
+                    shipment_content = guide.Contenido,
+                    weight = guide.Peso,
+                    value = guide.Valor,
+                    status = guide.Estado,
+                    tracking_number = guide.Tracking,
+                    tracking_url = guide.TrackingLink,
+                    closed_status = guide.Cerrada,
+                    closing_date = guide.FechaCierre.Date,
+                    bag_information = guide.Bolsa
+                }).ToList();
+
                 var jsonBody = JsonConvert.SerializeObject(new
                 {
                     from = new { email = "mailtrap@netboxworld.com", name = "Mailtrap Test" },
@@ -70,10 +86,14 @@ namespace SendingEmailWithASPNETCore.Services
                     template_uuid = tokenTemplate,
                     template_variables = new
                     {
-                        user_email = name,
-                        next_step_link= "Test_Next_step_link",
-                        get_started_link="Test_Get_started_link",
-                        onboarding_video_link="Test_Onboarding_video_link"
+                        client_name = name,
+                        guides = guidesList, // Aquí pasas la lista de guías
+                        tracking_portal_url = "https://www.google.com",
+                        customer_service_contact = "[Customer Service Email or Phone Number]",
+                        your_full_name = "[Your Full Name]",
+                        your_position = "[Your Position]",
+                        your_company = "[Your Company]",
+                        your_contact_information = "[Your Contact Information]"
                     }
                 });
 
@@ -84,7 +104,7 @@ namespace SendingEmailWithASPNETCore.Services
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var responseString = response.Content;
-                    return responseString;
+                    return "true";
                 }
                 else
                 {
@@ -99,6 +119,7 @@ namespace SendingEmailWithASPNETCore.Services
 
             throw new Exception("Failed to retrieve template content from Mailtrap.io");
         }
+
 
         public async Task<bool> SendMailAsync(MailData mailData)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ShipmentInformation
 {
-    public class Rootobject
+    public class ClientGuideData
     {
         public Cli Cli { get; set; }
         public Guide[] Guias { get; set; }
