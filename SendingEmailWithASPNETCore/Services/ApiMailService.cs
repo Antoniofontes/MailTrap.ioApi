@@ -66,17 +66,16 @@ namespace SendingEmailWithASPNETCore.Services
 
                 var guidesList = data.Guias.Select(guide => new
                 {
+                    awb= guide.Guia,
                     date = guide.Fecha.Date,
-                    sender_name = guide.Remitente,
-                    shipment_content = guide.Contenido,
+                    from_name = guide.Remitente,
+                    to_name = guide.Destinatario,
+                    contents = guide.Contenido,
                     weight = guide.Peso,
                     value = guide.Valor,
-                    status = guide.Estado,
                     tracking_number = guide.Tracking,
                     tracking_url = guide.TrackingLink,
-                    closed_status = guide.Cerrada,
-                    closing_date = guide.FechaCierre.Date,
-                    bag_information = guide.Bolsa
+                    
                 }).ToList();
 
                 var jsonBody = JsonConvert.SerializeObject(new
