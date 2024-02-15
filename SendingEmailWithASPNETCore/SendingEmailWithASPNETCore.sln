@@ -5,7 +5,12 @@ VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendingEmailWithASPNETCore", "SendingEmailWithASPNETCore.csproj", "{AC452C7E-5B1F-4A05-ABF6-F7FFBA502BDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipmentInformation", "..\ShipmentInformation\ShipmentInformation.csproj", "{C61A4D69-0274-405F-A4C5-4D288C927A0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShipmentInformation", "..\ShipmentInformation\ShipmentInformation.csproj", "{C61A4D69-0274-405F-A4C5-4D288C927A0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución", "Elementos de la solución", "{26EB7B33-B5EE-4253-BDCB-2457898C4955}"
+	ProjectSection(SolutionItems) = preProject
+		nlog.config = nlog.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

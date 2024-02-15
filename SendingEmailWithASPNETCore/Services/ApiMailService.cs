@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using NLog;
 using RestSharp;
 using ShipmentInformation;
 using System.Net;
@@ -10,6 +11,8 @@ namespace SendingEmailWithASPNETCore.Services
     {
         private readonly MailSettings _mailSettings;
         private readonly HttpClient _httpClient;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
 
         public APIMailService(IOptions<MailSettings> mailSettingsOptions, IHttpClientFactory httpClientFactory)
         {
@@ -43,6 +46,10 @@ namespace SendingEmailWithASPNETCore.Services
             if (response != null && response.TryGetValue("success", out object? success) && success is bool boolSuccess && boolSuccess)
             {
                 return true;
+            }
+            else
+            {
+                logger.Error("Error sending email to {0} with subject {1}", data.Cli.CliEma, "Shipment update");
             }
 
             return false;
@@ -87,12 +94,7 @@ namespace SendingEmailWithASPNETCore.Services
                     {
                         client_name = name,
                         guides = guidesList, // Aquí pasas la lista de guías
-                        tracking_portal_url = "https://www.google.com",
-                        customer_service_contact = "[Customer Service Email or Phone Number]",
-                        your_full_name = "[Your Full Name]",
-                        your_position = "[Your Position]",
-                        your_company = "[Your Company]",
-                        your_contact_information = "[Your Contact Information]"
+                       
                     }
                 });
 
@@ -107,13 +109,13 @@ namespace SendingEmailWithASPNETCore.Services
                 }
                 else
                 {
-                    Console.WriteLine($"Error: {response.StatusCode} - {response.StatusDescription}");
-                    Console.WriteLine($"Response Content: {response.Content}");
+                    logger.Error($"Error: {response.StatusCode} - {response.StatusDescription}");
+                    logger.Error($"Response Content: {response.Content}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
+                logger.Error($"Exception: {ex.Message}");
             }
 
             throw new Exception("Failed to retrieve template content from Mailtrap.io");
