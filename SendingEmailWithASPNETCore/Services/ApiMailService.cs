@@ -49,7 +49,7 @@ namespace SendingEmailWithASPNETCore.Services
             }
             else
             {
-                logger.Error("Error sending email to {0} with subject {1}", data.Cli.CliEma, "Shipment update");
+                logger.Info("Error sending email to {0} with subject {1}", data.Cli.CliEma, "Shipment update");
             }
 
             return false;
@@ -109,13 +109,13 @@ namespace SendingEmailWithASPNETCore.Services
                 }
                 else
                 {
-                    logger.Error($"Error: {response.StatusCode} - {response.StatusDescription}");
-                    logger.Error($"Response Content: {response.Content}");
+                    logger.Info($"Error: {response.StatusCode} - {response.StatusDescription}");
+                    logger.Info($"Response Content: {response.Content}");
                 }
             }
             catch (Exception ex)
             {
-                logger.Error($"Exception: {ex.Message}");
+                logger.Info($"Exception: {ex.Message}");
             }
 
             throw new Exception("Failed to retrieve template content from Mailtrap.io");

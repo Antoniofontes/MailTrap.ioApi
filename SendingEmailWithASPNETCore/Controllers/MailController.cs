@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 using SendingEmailWithASPNETCore.Services;
 using ShipmentInformation;
+using System.Reflection.Emit;
+using System.Xml.Linq;
+using System;
 
 namespace SendingEmailWithASPNETCore.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class MailAPIController : ControllerBase
+    public class MailAPIController : Controller
     {
         private readonly IAPIMailService _apiMailService;
-
         public MailAPIController(IAPIMailService apiMailService)
         {
             _apiMailService = apiMailService;
@@ -17,30 +20,45 @@ namespace SendingEmailWithASPNETCore.Controllers
 
         [HttpPost]
         [Route("SendMailAsync")]
-        public async Task<bool> SendMailAsync(MailData mailData)
+        public async Task<IActionResult> SendMailAsync(MailData mailData)
         {
-            return await _apiMailService.SendMailAsync(mailData);
+            bool result =await _apiMailService.SendMailAsync(mailData);
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
         [Route("SendHTMLMailAsync")]
-        public async Task<bool> SendHTMLMailAsync([FromBody] ClientGuideData clientGuideData, [FromHeader] string tokenTemplate)
+        public async Task<IActionResult> SendHTMLMailAsync([FromBody] ClientGuideData clientGuideData, [FromHeader] string tokenTemplate)
         {
            var result = await _apiMailService.SendHTMLMailAsync(clientGuideData, tokenTemplate);
-              if(!result)
+              if(result)
               {
-                return false;
+                return Ok();
               }
             
-           return true;
+           return BadRequest();
         }
 
         [HttpPost]
         [Route("SendMailWithAttachmentAsync")]
-        public async Task<bool> SendMailWithAttachmentAsync([FromForm] MailDataWithAttachment mailDataWithAttachment)
+        public async Task<IActionResult> SendMailWithAttachmentAsync([FromForm] MailDataWithAttachment mailDataWithAttachment)
         {
-            return await _apiMailService.SendMailWithAttachmentsAsync(mailDataWithAttachment);
+            bool result = await _apiMailService.SendMailWithAttachmentsAsync(mailDataWithAttachment);
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
-
     }
 }
